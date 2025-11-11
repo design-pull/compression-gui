@@ -10,7 +10,7 @@ import ttkbootstrap as tb
 # configuration
 PREVIEW_FRAME_WIDTH = 590
 THUMB_SIZE = (150, 150)
-GRID_COLUMNS = 3  # サムネイル横列数
+GRID_COLUMNS = 3  #サムネイル横列数
 
 class FileItem:
     def __init__(self, path):
