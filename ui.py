@@ -9,7 +9,7 @@ import ttkbootstrap as tb
 
 # configuration
 PREVIEW_FRAME_WIDTH = 590
-THUMB_SIZE = (150, 150)
+THUMB_SIZE = (185, 185)
 GRID_COLUMNS = 3  #サムネイル横列数
 
 class FileItem:
@@ -367,7 +367,6 @@ class AppUI:
         outdir = self.output_var.get()
         self.set_log(f"出力フォルダ: {outdir}")
         self.set_log(f"全体の圧縮後合計: {total_dst//1024} KB")
-        self.set_log("全てのタスクが完了しました")
 
     # -------------------------
     # Button callbacks (call controller)
