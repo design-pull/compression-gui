@@ -1,0 +1,9 @@
+{
+  "python.pythonPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.packageIndexDepths": {
+    "ttkbootstrap": 1
+  },
+  "python.analysis.extraPaths": ["./"],
+  "python.languageServer": "Pylance"
+}
