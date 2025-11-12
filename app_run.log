@@ -1,0 +1,116 @@
+INFO:ui:追加: 18 files
+INFO:ui:開始: 実行（書き出し）
+INFO:ui:開始: 70 ワーカーを起動しました (dry_run=False)
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/1080_fullhd.jpg
+original: 41 KB, compressed: 32 KB, reduced: 9 KB (21%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\1080_fullhd.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/407f05db0a6bf649b6c45acd69cbda2a_1802476386625046720.jpg
+original: 189 KB, compressed: 155 KB, reduced: 33 KB (18%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\407f05db0a6bf649b6c45acd69cbda2a_1802476386625046720.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/a_mysterious_person_claiming_to_belong_to_general_affairs_tsukasa.jpg
+original: 134 KB, compressed: 115 KB, reduced: 19 KB (14%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\a_mysterious_person_claiming_to_belong_to_general_affairs_tsukasa.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/4k.jpg
+original: 76 KB, compressed: 27 KB, reduced: 49 KB (64%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\4k.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/a_poem_lamenting_the_demise.jpg
+original: 127 KB, compressed: 104 KB, reduced: 23 KB (18%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\a_poem_lamenting_the_demise.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/0_abyssal_spiral_12_20240411.jpg
+original: 224 KB, compressed: 186 KB, reduced: 39 KB (17%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\0_abyssal_spiral_12_20240411.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/1190_2_GYhtuU4asAEmNqw.jpg
+original: 287 KB, compressed: 245 KB, reduced: 41 KB (14%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\1190_2_GYhtuU4asAEmNqw.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12__20221130.jpg
+original: 242 KB, compressed: 197 KB, reduced: 45 KB (19%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\abyssal_spiral_12__20221130.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/1de5985339aadd7441fe7bff5efc282d_1807919420940842843.jpg
+original: 110 KB, compressed: 106 KB, reduced: 3 KB (3%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\1de5985339aadd7441fe7bff5efc282d_1807919420940842843.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12_2022111d1.jpg
+original: 745 KB, compressed: 198 KB, reduced: 547 KB (73%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\abyssal_spiral_12_2022111d1.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12_20221108.jpg
+original: 790 KB, compressed: 210 KB, reduced: 580 KB (73%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\abyssal_spiral_12_20221108.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12_20221109.jpg
+original: 768 KB, compressed: 203 KB, reduced: 565 KB (74%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\abyssal_spiral_12_20221109.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12_2022111df1.jpg
+original: 778 KB, compressed: 210 KB, reduced: 568 KB (73%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\abyssal_spiral_12_2022111df1.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12_20221111.jpg
+original: 745 KB, compressed: 199 KB, reduced: 546 KB (73%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\abyssal_spiral_12_20221111.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/1080_fullhd.jpg
+original: 40 KB, compressed: 32 KB, reduced: 8 KB (21%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/407f05db0a6bf649b6c45acd69cbda2a_1802476386625046720.jpg
+original: 188 KB, compressed: 155 KB, reduced: 33 KB (18%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/4k.jpg
+original: 76 KB, compressed: 27 KB, reduced: 49 KB (64%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/a_poem_lamenting_the_demise.jpg
+original: 126 KB, compressed: 103 KB, reduced: 23 KB (18%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/a_mysterious_person_claiming_to_belong_to_general_affairs_tsukasa.jpg
+original: 134 KB, compressed: 115 KB, reduced: 19 KB (14%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/0_abyssal_spiral_12_20240411.jpg
+original: 224 KB, compressed: 185 KB, reduced: 38 KB (17%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12_20221119.jpg
+original: 467 KB, compressed: 242 KB, reduced: 225 KB (48%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\abyssal_spiral_12_20221119.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12__20221130.jpg
+original: 242 KB, compressed: 197 KB, reduced: 44 KB (19%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/1de5985339aadd7441fe7bff5efc282d_1807919420940842843.jpg
+original: 109 KB, compressed: 106 KB, reduced: 3 KB (3%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/1190_2_GYhtuU4asAEmNqw.jpg
+original: 286 KB, compressed: 245 KB, reduced: 41 KB (14%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12_2022111d1.jpg
+original: 745 KB, compressed: 197 KB, reduced: 547 KB (73%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12_20221108.jpg
+original: 790 KB, compressed: 209 KB, reduced: 580 KB (73%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12_20221109.jpg
+original: 768 KB, compressed: 203 KB, reduced: 565 KB (74%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/2_elemental_explosion_animation_video.jpg
+original: 669 KB, compressed: 532 KB, reduced: 137 KB (21%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\2_elemental_explosion_animation_video.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12_2022111df1.jpg
+original: 777 KB, compressed: 209 KB, reduced: 567 KB (73%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12_20221111.jpg
+original: 744 KB, compressed: 199 KB, reduced: 545 KB (73%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12_20221119.jpg
+original: 466 KB, compressed: 241 KB, reduced: 224 KB (48%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/2_elemental_explosion_animation_video.jpg
+original: 668 KB, compressed: 531 KB, reduced: 137 KB (21%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12_20221117.jpg
+original: 918 KB, compressed: 253 KB, reduced: 664 KB (72%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\abyssal_spiral_12_20221117.jpg
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/abyssal_spiral_12_20221117.jpg
+original: 917 KB, compressed: 253 KB, reduced: 664 KB (72%), method: unknown
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/82ff40309eaf4fd1ee37c4ed36048a43_7270002800065374533.png
+original: 1226 KB, compressed: 413 KB, reduced: 813 KB (66%), method: pngquant | dst: C:\Users\user\compression\output\82ff40309eaf4fd1ee37c4ed36048a43_7270002800065374533.png
+INFO:ui:D:/【原神】/■Aサムネ-アイキャッチ画像/82ff40309eaf4fd1ee37c4ed36048a43_7270002800065374533.png
+original: 1226 KB, compressed: 412 KB, reduced: 813 KB (66%), method: unknown
+INFO:ui:出力フォルダ: C:\Users\user\compression\output
+INFO:ui:全体の圧縮後合計: 3628 KB
+INFO:ui:全てのタスクが完了しました
+INFO:ui:追加: 8 files
+INFO:ui:開始: 実行（書き出し）
+INFO:ui:開始: 70 ワーカーを起動しました (dry_run=False)
+INFO:ui:C:/Users/user/Desktop/test_image/i-threnodian-edc05508.jpg
+original: 457 KB, compressed: 99 KB, reduced: 358 KB (78%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\i-threnodian-edc05508.jpg
+INFO:ui:C:/Users/user/Desktop/test_image/i-threnodian-edc05508.jpg
+original: 457 KB, compressed: 98 KB, reduced: 358 KB (78%), method: unknown
+INFO:ui:C:/Users/user/Desktop/test_image/mainvisual.jpg
+original: 537 KB, compressed: 340 KB, reduced: 198 KB (37%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\mainvisual.jpg
+INFO:ui:C:/Users/user/Desktop/test_image/mainvisual.jpg
+original: 537 KB, compressed: 339 KB, reduced: 197 KB (37%), method: unknown
+INFO:ui:C:/Users/user/Desktop/test_image/genshin_001.jpg
+original: 1566 KB, compressed: 306 KB, reduced: 1260 KB (80%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\genshin_001.jpg
+INFO:ui:C:/Users/user/Desktop/test_image/genshin_001.jpg
+original: 1565 KB, compressed: 305 KB, reduced: 1260 KB (80%), method: unknown
+INFO:ui:C:/Users/user/Desktop/test_image/G2u6fRuasAA8eum.jpg
+original: 2182 KB, compressed: 1934 KB, reduced: 248 KB (11%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\G2u6fRuasAA8eum.jpg
+INFO:ui:C:/Users/user/Desktop/test_image/G2u6fRuasAA8eum.jpg
+original: 2181 KB, compressed: 1933 KB, reduced: 248 KB (11%), method: unknown
+INFO:ui:C:/Users/user/Desktop/test_image/h2-servant.png
+original: 35 KB, compressed: 24 KB, reduced: 12 KB (33%), method: pngquant | dst: C:\Users\user\compression\output\h2-servant.png
+INFO:ui:C:/Users/user/Desktop/test_image/h2-servant.png
+original: 35 KB, compressed: 23 KB, reduced: 11 KB (33%), method: unknown
+INFO:ui:C:/Users/user/Desktop/test_image/aalto_render__wuthering_waves__by_kabasara_dj5cnxk-414w-2x.png
+original: 829 KB, compressed: 189 KB, reduced: 640 KB (77%), method: pngquant | dst: C:\Users\user\compression\output\aalto_render__wuthering_waves__by_kabasara_dj5cnxk-414w-2x.png
+INFO:ui:C:/Users/user/Desktop/test_image/aalto_render__wuthering_waves__by_kabasara_dj5cnxk-414w-2x.png
+original: 828 KB, compressed: 188 KB, reduced: 639 KB (77%), method: unknown
+INFO:ui:C:/Users/user/Desktop/test_image/chisa_001.png
+original: 700 KB, compressed: 183 KB, reduced: 518 KB (74%), method: pngquant | dst: C:\Users\user\compression\output\chisa_001.png
+INFO:ui:C:/Users/user/Desktop/test_image/chisa_001.png
+original: 700 KB, compressed: 182 KB, reduced: 517 KB (74%), method: unknown
+INFO:ui:C:/Users/user/Desktop/test_image/sスクリーンショット 2025-11-09 181420.png
+original: 396 KB, compressed: 109 KB, reduced: 287 KB (73%), method: pngquant | dst: C:\Users\user\compression\output\sスクリーンショット 2025-11-09 181420.png
+INFO:ui:C:/Users/user/Desktop/test_image/sスクリーンショット 2025-11-09 181420.png
+original: 395 KB, compressed: 108 KB, reduced: 287 KB (73%), method: unknown
+INFO:ui:出力フォルダ: C:\Users\user\compression\output
+INFO:ui:全体の圧縮後合計: 3181 KB
+INFO:ui:全てのタスクが完了しました

@@ -1,17 +1,105 @@
 # ui.py
 import os
+import sys
 import threading
 import tempfile
+import subprocess
+import logging
+import traceback
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 import ttkbootstrap as tb
+from typing import List, Optional, Sequence, Tuple
 
-# configuration
+# -----------------------
+# Logging
+# -----------------------
+logging.basicConfig(filename='app_run.log', level=logging.INFO, encoding='utf-8')
+logger = logging.getLogger(__name__)
+
+def log_exception(exc: Exception) -> None:
+    logger.error("Unhandled exception:\n%s", traceback.format_exc())
+
+# -----------------------
+# resource_path (onefile 対応)
+# -----------------------
+def resource_path(relative_path: str) -> str:
+    """
+    PyInstaller onefile に対応したリソース参照。
+    """
+    try:
+        if getattr(sys, 'frozen', False):
+            base = sys._MEIPASS  # type: ignore
+        else:
+            base = os.path.abspath(".")
+    except Exception:
+        base = os.path.abspath(".")
+    return os.path.join(base, relative_path)
+
+# -----------------------
+# run_no_window: try import from utils.process, fallback to local implementation
+# -----------------------
+try:
+    from utils.process import run_no_window  # type: ignore
+except Exception:
+    # local fallback (compatible with previous examples)
+    CREATE_NO_WINDOW = 0x08000000
+
+    def run_no_window(cmd_args: Sequence[str],
+                      cwd: Optional[str] = None,
+                      timeout: Optional[float] = None) -> Tuple[int, str, str]:
+        startupinfo = None
+        creationflags = 0
+        if sys.platform == "win32":
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            creationflags = CREATE_NO_WINDOW
+
+        proc = subprocess.Popen(
+            list(cmd_args),
+            cwd=cwd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            stdin=subprocess.DEVNULL,
+            startupinfo=startupinfo,
+            creationflags=creationflags,
+            shell=False,
+            text=True
+        )
+        try:
+            out, err = proc.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            out, err = proc.communicate()
+            logger.warning("Process timeout: %s", cmd_args)
+            return proc.returncode, out or "", err or ""
+        return proc.returncode, out or "", err or ""
+
+# -----------------------
+# Pillow helper for JPEG
+# -----------------------
+def pillow_save_jpeg(src: str, dst: str, quality: int) -> None:
+    img = Image.open(src)
+    if img.mode in ("RGBA", "LA"):
+        background = Image.new("RGB", img.size, (255, 255, 255))
+        background.paste(img, mask=img.split()[3])
+        img = background
+    else:
+        img = img.convert("RGB")
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    img.save(dst, format="JPEG", quality=quality, optimize=True)
+
+# -----------------------
+# UI Constants (kept from your code)
+# -----------------------
 PREVIEW_FRAME_WIDTH = 590
 THUMB_SIZE = (185, 185)
-GRID_COLUMNS = 3  #サムネイル横列数
+GRID_COLUMNS = 3  # サムネイル横列数
 
+# -----------------------
+# FileItem and ScrollCanvas
+# -----------------------
 class FileItem:
     def __init__(self, path):
         self.path = path
@@ -21,6 +109,7 @@ class FileItem:
         self.method = None
         self.status = "待機"
         self._frame = None
+        self._thumb_img = None
 
 class ScrollCanvas(tb.Frame):
     """Canvas + inner Frame の垂直スクロール領域（Windows マウスホイール対応）"""
@@ -53,19 +142,18 @@ class ScrollCanvas(tb.Frame):
         except Exception:
             pass
 
+# -----------------------
+# Main AppUI
+# -----------------------
 class AppUI:
     def __init__(self, master,
                  output_dir_default,
-                 on_start_callback,
-                 on_start_dry_callback,
-                 on_stop_callback,
-                 on_clear_callback):
+                 on_start_callback=None,
+                 on_start_dry_callback=None,
+                 on_stop_callback=None,
+                 on_clear_callback=None):
         """
-        Callbacks:
-         - on_start_callback(files, outdir, quality)
-         - on_start_dry_callback(files, outdir, quality)
-         - on_stop_callback()
-         - on_clear_callback()
+        Callbacks optional. If not provided, AppUI uses internal worker logic.
         """
         self.master = master
         self.on_start = on_start_callback
@@ -77,17 +165,20 @@ class AppUI:
         self.master.title("Image Compressor GUI")
         self._center_window(1200, 760)
 
-        self.files = []
-        self._completion_emitted = False
+        self.files: List[FileItem] = []
+        self.output_folder = output_dir_default or os.path.abspath("output")
+        os.makedirs(self.output_folder, exist_ok=True)
 
-        self._build_topbar(output_dir_default)
+        self._completion_emitted = False
+        self._stop_requested = False
+        self._worker_thread: Optional[threading.Thread] = None
+
+        self._build_topbar(self.output_folder)
         self._build_main_pane()
         self._build_statusbar()
         self._set_shortcuts()
 
-    # -------------------------
-    # Window helpers
-    # -------------------------
+    # ---- window helpers ----
     def _center_window(self, width, height):
         self.master.geometry(f"{width}x{height}")
         self.master.update_idletasks()
@@ -97,37 +188,28 @@ class AppUI:
         y = (sh // 2) - (height // 2)
         self.master.geometry(f"+{x}+{y}")
 
-    # -------------------------
-    # Build UI
-    # -------------------------
+    # ---- build UI ----
     def _build_topbar(self, output_dir_default):
         top = tb.Frame(self.master, padding=8)
         top.pack(side=tk.TOP, fill=tk.X)
 
-        # 左端: ファイル追加（背景色を #51f0c9 に設定）
         self.add_btn = tb.Button(top, text="ファイル追加", bootstyle="primary", command=self._on_add_files)
         self.add_btn.pack(side=tk.LEFT, padx=4)
-        # Try to apply background color for immediate visual cue (ttk may ignore; best-effort)
         try:
             self.add_btn.configure(background="#51f0c9", activebackground="#47e6bd")
         except Exception:
             pass
 
-        # 実行（書き出し）を左寄せ
         tb.Button(top, text="実行（書き出し）", bootstyle="primary", command=self._on_run).pack(side=tk.LEFT, padx=8)
-
-        # 画質（Quality）数値入力（初期値70）
         tb.Label(top, text="画質 (Quality)", font=("Segoe UI", 9)).pack(side=tk.LEFT, padx=(12,4))
         self.quality_var = tk.IntVar(value=70)
         tb.Spinbox(top, from_=10, to=100, textvariable=self.quality_var, width=5).pack(side=tk.LEFT, padx=4)
 
-        # 出力フォルダ
         tb.Label(top, text="出力フォルダ", font=("Segoe UI", 9, "bold")).pack(side=tk.LEFT, padx=(12,6))
         self.output_var = tk.StringVar(value=output_dir_default)
         tb.Entry(top, textvariable=self.output_var, width=40).pack(side=tk.LEFT, padx=4)
         tb.Button(top, text="変更", bootstyle="success", command=self._choose_output).pack(side=tk.LEFT, padx=4)
 
-        # 右側操作: ドライ実行（右）, 停止, クリア
         tb.Button(top, text="ドライ実行（書き出しなし）", bootstyle="warning", command=self._on_dry_run).pack(side=tk.RIGHT, padx=4)
         tb.Button(top, text="停止", bootstyle="danger", command=self._on_stop).pack(side=tk.RIGHT, padx=4)
         tb.Button(top, text="クリア", bootstyle="secondary", command=self._on_clear).pack(side=tk.RIGHT, padx=4)
@@ -136,23 +218,19 @@ class AppUI:
         pane = tb.Panedwindow(self.master, orient=tk.HORIZONTAL)
         pane.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
 
-        # 左: プレビュー（上） + サムネイルスクロール（下）
         left_frame = tb.Frame(pane)
         pane.add(left_frame, weight=3)
 
-        # プレビュー領域（境界線なし）
         self.preview_frame = tb.Frame(left_frame, width=PREVIEW_FRAME_WIDTH, height=280)
         self.preview_frame.pack(fill=tk.X, padx=6, pady=(0,8))
         self.preview_frame.pack_propagate(False)
         self.preview_image_label = tb.Label(self.preview_frame, text="プレビュー領域（ここに選択画像表示）", anchor="center", bootstyle="light")
         self.preview_image_label.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
 
-        # サムネイル（スクロール）
         self.thumb_scroller = ScrollCanvas(left_frame)
         self.thumb_scroller.pack(fill=tk.BOTH, expand=True)
         self.thumb_container = self.thumb_scroller.inner
 
-        # 右: ログ（下まで表示）
         right_frame = tb.Frame(pane)
         pane.add(right_frame, weight=1)
         tb.Label(right_frame, text="ログ", font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=6, pady=(0,6))
@@ -174,37 +252,26 @@ class AppUI:
     # -------------------------
     # Logging and public actions
     # -------------------------
-    def set_log(self, text):
+    def set_log(self, text: str) -> None:
         self.log_text.insert("end", text + "\n")
         self.log_text.see("end")
+        logger.info(text)
 
     def update_file_result(self, path, new_size, method, error=None):
-        """
-        Called by worker when a file is processed.
-        - path: original path
-        - new_size: compressed size in bytes or None
-        - method: description string (may include dst)
-        - error: error message or None
-        """
         item = next((f for f in self.files if f.path == path), None)
         if not item:
             return
         item.new_size = new_size
         item.method = method
         item.status = "エラー" if error else "完了"
-
-        # Update badge to show "% / <圧縮後KB>"
         self._update_thumbnail_badge_with_stats(item)
         self._refresh_stats()
-
         if error:
             self.set_log(f"{path}\n→ Error: {error}")
         else:
             saved = max(0, item.orig_size - item.new_size)
             saved_pct = (saved / item.orig_size * 100) if item.orig_size else 0
             self.set_log(f"{path}\noriginal: {item.orig_size//1024} KB, compressed: {item.new_size//1024} KB, reduced: {saved//1024} KB ({saved_pct:.0f}%), method: {method}")
-
-        # Completion summary (emit only once)
         self._maybe_emit_completion_summary()
 
     # -------------------------
@@ -231,7 +298,6 @@ class AppUI:
             self.files.append(fi)
             self._add_thumbnail(fi)
             added += 1
-        # If first added and preview empty, display first image in preview
         if added and self.preview_image_label and self.files:
             first = self.files[0]
             self._display_in_preview(first.path)
@@ -245,46 +311,36 @@ class AppUI:
         frame = tb.Frame(self.thumb_container, width=THUMB_SIZE[0]+12, padding=6, relief="flat")
         frame.grid_propagate(False)
         frame.grid(row=r, column=c, padx=6, pady=6, sticky="n")
-
-        # 150px サムネイル
         try:
             img = Image.open(fileitem.path)
             img.thumbnail(THUMB_SIZE)
             tkimg = ImageTk.PhotoImage(img)
         except Exception:
             tkimg = ImageTk.PhotoImage(Image.new("RGBA", THUMB_SIZE, (240,240,240,255)))
-
         lbl_img = tb.Label(frame, image=tkimg)
         lbl_img.image = tkimg
         lbl_img.pack()
         lbl_img.bind("<Button-1>", lambda e, p=fileitem.path: self._on_thumb_click(p))
-
         lbl_text = tb.Label(frame, text=fileitem.basename, wraplength=THUMB_SIZE[0])
         lbl_text.pack(fill=tk.X, pady=(6,0))
-
         badge = tb.Label(frame, text=fileitem.status, bootstyle="info")
         badge.pack(pady=(4,0))
-
         frame._badge = badge
         fileitem._frame = frame
 
     def _on_thumb_click(self, path):
         self._display_in_preview(path)
-        # bring thumbnail into view
         for f in self.files:
             if f.path == path and hasattr(f, "_frame"):
                 try:
                     widget = f._frame
                     self.thumb_scroller.canvas.update_idletasks()
-                    # compute widget bbox relative to canvas
                     bbox_all = self.thumb_scroller.canvas.bbox("all")
                     if bbox_all:
                         y1 = widget.winfo_rooty() - self.thumb_scroller.canvas.winfo_rooty()
-                        # approximate move
                         self.thumb_scroller.canvas.yview_moveto(max(0, y1 / max(1, bbox_all[3])))
                 except Exception:
                     pass
-                # flash border
                 widget.configure(relief="solid")
                 self.master.after(600, lambda w=widget: w.configure(relief="flat"))
                 break
@@ -385,7 +441,11 @@ class AppUI:
             self._update_thumbnail_badge_with_stats(f)
         self.set_log("開始: 実行（書き出し）")
         try:
-            self.on_start(files_paths, outdir, quality)
+            if self.on_start:
+                self.on_start(files_paths, outdir, quality)
+            else:
+                # use internal worker if no controller provided
+                self._start_worker(files_paths, outdir, quality, dry=False)
         except Exception as e:
             self.set_log(f"開始エラー: {e}")
 
@@ -402,14 +462,20 @@ class AppUI:
             self._update_thumbnail_badge_with_stats(f)
         self.set_log("開始: ドライ実行（書き出しなし）")
         try:
-            self.on_start_dry(files_paths, outdir, quality)
+            if self.on_start_dry:
+                self.on_start_dry(files_paths, outdir, quality)
+            else:
+                self._start_worker(files_paths, outdir, quality, dry=True)
         except Exception as e:
             self.set_log(f"開始エラー: {e}")
 
     def _on_stop(self):
         self.set_log("停止要求を送信しました")
         try:
-            self.on_stop()
+            if self.on_stop:
+                self.on_stop()
+            else:
+                self._stop_requested = True
         except Exception as e:
             self.set_log(f"停止エラー: {e}")
 
@@ -423,9 +489,84 @@ class AppUI:
             self._completion_emitted = False
             self._refresh_stats()
             try:
-                self.on_clear()
+                if self.on_clear:
+                    self.on_clear()
             except Exception:
                 pass
+
+    # -------------------------
+    # Worker management and compression
+    # -------------------------
+    def _start_worker(self, files_paths: List[str], outdir: str, quality: int, dry: bool = False) -> None:
+        if self._worker_thread and self._worker_thread.is_alive():
+            self.set_log("既にワーカーが実行中です")
+            return
+        self._stop_requested = False
+        self._worker_thread = threading.Thread(target=self._worker, args=(files_paths, outdir, quality, dry), daemon=True)
+        self._worker_thread.start()
+
+    def _compress_one(self, src: str, dst: str, quality: int, dry: bool=False) -> Tuple[bool, Optional[int], str]:
+        """
+        Try bundled pngquant first (no-console). If not available or fails, use Pillow.
+        Returns: (success, new_size_bytes or None, method_desc)
+        """
+        try:
+            pngquant_path = resource_path("tools/pngquant.exe")
+            if os.path.exists(pngquant_path):
+                # pngquant parameters: adjust as needed; pngquant writes to stdout or to --output
+                args = [pngquant_path, f"--quality={quality}", "--output", dst, src]
+                # run_no_window prevents console flashing on Windows
+                rc, out, err = run_no_window(args, timeout=30)
+                if rc == 0 and os.path.exists(dst):
+                    return True, os.path.getsize(dst), "pngquant"
+                else:
+                    logger.warning("pngquant failed rc=%s err=%s", rc, err)
+            # fallback: Pillow
+            if dry:
+                # don't write file, but simulate size change by estimating (here halve)
+                est_size = max(1, os.path.getsize(src) // 2)
+                return True, est_size, "pillow-dry"
+            _, ext = os.path.splitext(src)
+            ext = ext.lower()
+            if ext in (".jpg", ".jpeg"):
+                pillow_save_jpeg(src, dst, quality)
+            elif ext in (".png",):
+                img = Image.open(src)
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+                img.save(dst, optimize=True)
+            else:
+                # convert others to jpeg for compression
+                pillow_save_jpeg(src, dst, quality)
+            return True, os.path.getsize(dst) if os.path.exists(dst) else None, "pillow"
+        except Exception:
+            logger.exception("compress error for %s", src)
+            return False, None, traceback.format_exc()
+
+    def _worker(self, files_paths: List[str], outdir: str, quality: int, dry: bool=False) -> None:
+        for src in files_paths:
+            if self._stop_requested:
+                self.set_log("Processing stopped by user.")
+                break
+            # find FileItem
+            item = next((f for f in self.files if f.path == src), None)
+            if item:
+                item.status = "処理中"
+                self._update_thumbnail_badge_with_stats(item)
+            dst_name = os.path.basename(src)
+            dst = os.path.join(outdir, dst_name)
+            self.set_log(f"Processing: {src}")
+            success, new_size, method = self._compress_one(src, dst, quality, dry=dry)
+            if success:
+                # update FileItem in UI thread
+                if item:
+                    item.new_size = new_size or os.path.getsize(src)
+                    item.method = method
+                self.master.after(0, lambda p=src, n=new_size, m=method: self.update_file_result(p, n, m, None))
+            else:
+                if item:
+                    item.status = "エラー"
+                self.master.after(0, lambda p=src, n=None, m=None, e="compress failed": self.update_file_result(p, n, m, e))
+        self.master.after(0, lambda: self.set_log("処理完了"))
 
 # -------------------------
 # Minimal test harness
@@ -454,8 +595,8 @@ if __name__ == "__main__":
 
     root = tb.Window(themename="litera")
     ui = AppUI(root, output_dir_default=os.path.join(os.getcwd(), "output"),
-               on_start_callback=stub_start,
-               on_start_dry_callback=stub_start_dry,
-               on_stop_callback=stub_stop,
-               on_clear_callback=stub_clear)
+               on_start_callback=None,
+               on_start_dry_callback=None,
+               on_stop_callback=None,
+               on_clear_callback=None)
     root.mainloop()
