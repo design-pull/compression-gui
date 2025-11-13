@@ -150,3 +150,25 @@ INFO:ui:全体の圧縮後合計: 3072 KB
 INFO:ui:全てのタスクが完了しました
 INFO:ui:停止要求を送信しました
 INFO:ui:停止: 実行中の作業がありません
+INFO:ui:追加: 4 files
+INFO:ui:開始: 実行（書き出し）
+INFO:ui:開始: 70 ワーカーを起動しました (dry_run=False)
+INFO:ui:C:/Users/user/Desktop/test_image/i-threnodian-edc05508.jpg
+original: 457 KB, compressed: 99 KB, reduced: 358 KB (78%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\i-threnodian-edc05508.jpg
+INFO:ui:C:/Users/user/Desktop/test_image/i-threnodian-edc05508.jpg
+original: 457 KB, compressed: 98 KB, reduced: 358 KB (78%), method: unknown
+INFO:ui:C:/Users/user/Desktop/test_image/genshin_001.jpg
+original: 1566 KB, compressed: 306 KB, reduced: 1260 KB (80%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\genshin_001.jpg
+INFO:ui:C:/Users/user/Desktop/test_image/genshin_001.jpg
+original: 1565 KB, compressed: 305 KB, reduced: 1260 KB (80%), method: unknown
+INFO:ui:C:/Users/user/Desktop/test_image/G2u6fRuasAA8eum.jpg
+original: 2182 KB, compressed: 1934 KB, reduced: 248 KB (11%), method: Pillow(JPEG q=85) | dst: C:\Users\user\compression\output\G2u6fRuasAA8eum.jpg
+INFO:ui:C:/Users/user/Desktop/test_image/G2u6fRuasAA8eum.jpg
+original: 2181 KB, compressed: 1933 KB, reduced: 248 KB (11%), method: unknown
+INFO:ui:C:/Users/user/Desktop/test_image/h2-servant.png
+original: 35 KB, compressed: 24 KB, reduced: 12 KB (33%), method: pngquant | dst: C:\Users\user\compression\output\h2-servant.png
+INFO:ui:C:/Users/user/Desktop/test_image/h2-servant.png
+original: 35 KB, compressed: 23 KB, reduced: 11 KB (33%), method: unknown
+INFO:ui:出力フォルダ: C:\Users\user\compression\output
+INFO:ui:全体の圧縮後合計: 2361 KB
+INFO:ui:全てのタスクが完了しました
