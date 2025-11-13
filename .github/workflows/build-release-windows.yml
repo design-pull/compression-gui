@@ -1,0 +1,103 @@
+name: Build and Release Windows EXE
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+env:
+  PYTHON_VERSION: '3.12'
+  APP_PY: app.py
+  DIST_NAME: app.exe
+  RELEASE_DIR: release
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller==6.16.0
+
+      - name: Verify tools/pngquant presence (repo-provided)
+        id: check_tools
+        run: |
+          if (Test-Path tools\pngquant.exe) {
+            Write-Host "pngquant found in repo"
+            echo "pngquant_present=true" >> $GITHUB_OUTPUT
+          } else {
+            Write-Host "pngquant NOT found in repo; build will fallback to Pillow"
+            echo "pngquant_present=false" >> $GITHUB_OUTPUT
+          }
+        shell: pwsh
+
+      - name: Clean previous build artifacts
+        run: |
+          if (Test-Path dist) { Remove-Item -Recurse -Force dist }
+          if (Test-Path build) { Remove-Item -Recurse -Force build }
+          if (Test-Path app.spec) { Remove-Item -Force app.spec }
+        shell: pwsh
+
+      - name: Build with PyInstaller
+        run: |
+          # If pngquant is missing we still run with --add-data "tools;tools" (empty folder harmless)
+          pyinstaller --onefile --noconsole --icon=img\icon.ico --add-data "img;img" --add-data "tools;tools" %APP_PY%
+        shell: cmd
+
+      - name: Prepare release artifacts
+        run: |
+          mkdir %RELEASE_DIR%
+          copy dist\%DIST_NAME% %RELEASE_DIR%\%DIST_NAME%
+          powershell -Command "Get-FileHash -Path '%RELEASE_DIR%\\%DIST_NAME%' -Algorithm SHA256 | Format-List > '%RELEASE_DIR%\\SHA256SUM.txt'"
+          powershell -Command "Compress-Archive -Path %RELEASE_DIR%\\* -DestinationPath %RELEASE_DIR%\\app-windows-${{ github.ref_name }}.zip -Force"
+        shell: cmd
+
+      - name: Create GitHub Release (draft)
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: |
+            Automated build for ${{ github.ref_name }}.
+            Artifacts: app-windows-${{ github.ref_name }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload ZIP to Release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${RELEASE_DIR}/app-windows-${{ github.ref_name }}.zip
+          asset_name: app-windows-${{ github.ref_name }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload SHA256 to Release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${RELEASE_DIR}/SHA256SUM.txt
+          asset_name: SHA256SUM-${{ github.ref_name }}.txt
+          asset_content_type: text/plain
